@@ -3,7 +3,7 @@
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\AnswerController;
-
+use App\Http\Controllers\QuestionsMoreController;
 
 
 use Illuminate\Support\Facades\Route;
@@ -42,6 +42,8 @@ Route::get('/challenges/{challenge}/edit', [ChallengeController::class, 'edit'])
 Route::put('/challenges/{challenge}', [ChallengeController::class, 'update'])->name('challenges.update');
 Route::delete('/challenges/{challenge}/destroy', [ChallengeController::class, 'destroy'])->name('challenges.destroy');
 //Questions import
+Route::get('/questionsmore', [QuestionsMoreController::class, 'index'])->name('questionsmore.index');
+Route::post('/questionsmore/import', [QuestionsMoreController::class, 'import'])->name('questionsmore.import');
 
 
 
