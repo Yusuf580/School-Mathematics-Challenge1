@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\ChallengeController;
-use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\AnswerController;
+
 
 
 use Illuminate\Support\Facades\Route;
@@ -40,18 +41,13 @@ Route::get('/challenges/{challenge}', [ChallengeController::class, 'show'])->nam
 Route::get('/challenges/{challenge}/edit', [ChallengeController::class, 'edit'])->name('challenges.edit');
 Route::put('/challenges/{challenge}', [ChallengeController::class, 'update'])->name('challenges.update');
 Route::delete('/challenges/{challenge}/destroy', [ChallengeController::class, 'destroy'])->name('challenges.destroy');
+//Questions import
 
 
-Route::get('/question', [QuestionController::class, 'index'])->name('questions.index');
-Route::get('/question/create', [QuestionController::class, 'create'])->name('questions.create');
-Route::post('/question', [QuestionController::class, 'store'])->name('questions.store');
-Route::get('/question/{question}', [QuestionController::class, 'show'])->name('questions.show');
-Route::get('/question/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
-Route::put('/question/{question}', [QuestionController::class, 'update'])->name('questions.update');
-Route::delete('/question/{question}/destroy', [QuestionController::class, 'destroy'])->name('questions.destroy');
 
-
-Route::post('questions/import', [QuestionController::class, 'import'])->name('questions.import');
+//answers  page
+Route::get('/answers', [AnswerController::class, 'index'])->name('answers.index');
+Route::post('/answers/import', [AnswerController::class, 'import'])->name('answers.import');
 
 
 
