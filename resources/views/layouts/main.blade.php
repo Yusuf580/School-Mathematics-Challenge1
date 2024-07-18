@@ -48,7 +48,7 @@
                         <a class="nav-link" href="{{ route('challenges.index') }}">Challenges</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('questions.index') }}">Questions</a>
+                        <a class="nav-link" href="{{ route('questionsmore.index') }}">Questions</a>
                     </li>
                     <!-- Add more navigation items as needed -->
                 </ul>
