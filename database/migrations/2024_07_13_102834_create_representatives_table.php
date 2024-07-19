@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('representatives', function (Blueprint $table) {
-            $table->id();
-            $table->string('email')->unique();
+        
+            $table->string('email')->primary();
             $table->string('password');
-            $table->string('Registration');
-            $table->timestamps();
+            $table->string('registrationNumber');
+
         });
     }
 
