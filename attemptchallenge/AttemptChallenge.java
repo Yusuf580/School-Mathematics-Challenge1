@@ -7,25 +7,31 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class AttemptChallenge {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/nationschools";
-    private static final String USER = "root";
-    private static final String PASS = "";
+    private  final String DB_URL = "jdbc:mysql://localhost:3306/nationschools";
+    private final String USER = "root";
+    private  final String PASS = "";
     private static final int QUESTION_TIME_LIMIT = 1;//time limit per question in minutes
-    public static void main(String[] args){
+
+
+
+
+
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter challenge Title e.g CH001: ");
         String challengeTitle = scanner.nextLine();
+        Class.forName("com.mysql.cj.jdbc.Driver");
 
-        try(Connection conn= new DriverManager.getConnection(DB_URL, USER, PASS)){
-            checkAndPromptQuestions(conn, challengeTitle, scanner);
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
+
+
+            checkAndPromptQuestions( challengeTitle, scanner);
     }
 
-    private static void checkAndPromptQuestions(Connection conn, String challengeTitle, Scanner scanner) throws SQLException{
-        if (isChallengeActive(conn, challengeTitle)){
-            List<String> questions = getRandomQuestions(conn,challengeTitle, 10);
+    private static void checkAndPromptQuestions( String challengeTitle, Scanner scanner) throws SQLException, ClassNotFoundException {
+
+
+        if (isChallengeActive( challengeTitle)){
+            List<String> questions = getRandomQuestions(challengeTitle, 10);
             for (String question : questions){
                 boolean timeup = promptQuestion(question, scanner);
                 if (timeup){
@@ -37,8 +43,10 @@ public class AttemptChallenge {
             System.out.println("The challenge is not active.");
         }
     }
-    private static boolean isChallengeActive(Connection conn, String challengeTitle)throws SQLException{
-        String query = "SELECT is_active from challenges WHERE challengeTitle = ?";
+    private static boolean isChallengeActive( String challengeTitle) throws SQLException, ClassNotFoundException {
+        String query = "SELECT is_active from challenges WHERE title = ?";
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection conn= DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools","root","");
         try (PreparedStatement stmt = conn.prepareStatement(query)){
             stmt.setString(1, challengeTitle);
             ResultSet rs = stmt.executeQuery();
@@ -48,8 +56,10 @@ public class AttemptChallenge {
         }
         return false;
     }
-    private static List<String> getRandomQuestions(Connection conn, String challengeTitle, int limit) throws SQLException{
+    private static List<String> getRandomQuestions( String challengeTitle, int limit) throws SQLException, ClassNotFoundException {
         List<String> questions = new ArrayList<>();
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection conn= DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools","root","");
         String query = "SELECT question FROM questionsmore WHERE challenge_title = ? ORDER BY RAND() LIMIT ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)){
             stmt.setString(1, challengeTitle);
@@ -80,3 +90,6 @@ public class AttemptChallenge {
         return false;
     }
 }
+
+
+
