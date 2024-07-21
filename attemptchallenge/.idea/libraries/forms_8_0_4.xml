@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="forms-8.0.4">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../forms-8.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../kernel-8.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../io-8.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../layout-8.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../pdfa-8.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../pdftest-8.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../pdfua-8.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../sign-8.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../styled-xml-parser-8.0.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../svg-8.0.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
