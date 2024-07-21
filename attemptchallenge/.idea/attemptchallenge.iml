@@ -11,5 +11,9 @@
     <orderEntry type="library" name="mailapi" level="project" />
     <orderEntry type="library" name="mysql-connector-j-8.4.01" level="project" />
     <orderEntry type="library" name="mysql-connector-j-8.4.02" level="project" />
+    <orderEntry type="library" name="forms-8.0.4" level="project" />
+    <orderEntry type="library" name="commons-8.0.4" level="project" />
+    <orderEntry type="library" name="slf4j-api-2.1.0-alpha1-javadoc" level="project" />
+    <orderEntry type="library" name="slf4j-reload4j-2.0.13" level="project" />
   </component>
 </module>
