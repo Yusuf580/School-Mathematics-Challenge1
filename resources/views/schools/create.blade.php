@@ -13,7 +13,7 @@
             <input type="text" id="Registration" name="Registration" class="form-control" required>
         </div>
         <div class="form-group">
-            <label for="District">District:</label>
+            <label for="Dsitrict">District:</label>
             <input type="text" id="District" name="District" class="form-control" required>
         </div>
         <div class="form-group">
