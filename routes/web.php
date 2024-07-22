@@ -3,6 +3,7 @@
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\AnswerController;
+use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\QuestionsMoreController;
 
 
@@ -25,6 +26,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 //Routes concerning entering the schools
+Route::get('/participants', [ParticipantController::class,'participant' ])->name('schools.participant');
 Route::get('/schools', [SchoolController::class, 'index'])->name('schools.index');
 Route::get('/schools/create', [SchoolController::class, 'create'])->name('schools.create');
 Route::post('/schools', [SchoolController::class, 'store'])->name('schools.store');

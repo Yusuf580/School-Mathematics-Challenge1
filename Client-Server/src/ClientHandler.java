@@ -96,10 +96,10 @@ public class ClientHandler extends Thread {
                boolean bool;
              try{  bool=setPassword(Username,password);
                  if(bool){
-                     output.println("Password has been set.");
+                     output.println("true");
                  }
                  else {
-                     output.println("Operation not successfull!");
+                     output.println("false");
                  }
                  }
              catch (java.io.IOException e){
@@ -428,7 +428,7 @@ while(resultSet.next()){
        }
 
        private String saverUserImage(String path,String username) throws IOException {
-           String serverdirectory="C:/xampp/htdocs/School-Mathematics-Challenge1/Participant_Images/";
+           String serverdirectory="C:/xampp/htdocs/School-Mathematics-Challenge1/participant-images/";
            byte[] imageData = Files.readAllBytes(Paths.get(path));
 
            File directory=new File(serverdirectory);
@@ -448,7 +448,34 @@ while(resultSet.next()){
 
        }
 
+    private void viewChallenges()throws java.sql.SQLException,
+        java.lang.ClassNotFoundException,java.io.IOException {
+output=new PrintWriter(socket.getOutputStream(),true);
+        String sql="SELECT * FROM challenges WHERE is_valid=1;";
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools","root","");
+        Statement statement =connection.createStatement();
+        ResultSet resultSet=statement.executeQuery(sql);
+        if(resultSet.next()){
+while(resultSet.next()){
+    String challenge_number=resultSet.getString("title");
+    String openingDate=resultSet.getString("start_date");
+    String closingDate=resultSet.getString("end_date");
+    String duration=resultSet.getString("duration");
+    String challenge=(challenge_number+ " " + openingDate + " " +closingDate+ " " +duration);
+    output.println(challenge);
+
 }
+    output.println("END");
+        }
+        else {
+            output.println("No available challenges");
+        }
+    }
+
+}
+
+
 
 
 

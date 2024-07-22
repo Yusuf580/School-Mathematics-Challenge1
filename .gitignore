@@ -16,3 +16,8 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+Client-Server/src/ClientHandler.java
+Client-Server/src/Participant.java
+Client-Server/src/ClientHandler.java
+Client-Server/src/Participant.java
+database/migrations/2024_07_21_142721_participant_scores.php

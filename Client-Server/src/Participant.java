@@ -90,8 +90,22 @@ public class Participant {
             String user=username+ " " +passWord;
            String out= connectServer(user,socket);
            if("true".equals(out)){
-               System.out.println("No available challenges");
-               Scanner scanner=new Scanner(System.in);
+               String view="viewChallenges";
+
+               try{ PrintWriter send=new PrintWriter(socket.getOutputStream(),true);
+                   send.println(view);}
+               catch (java.io.IOException ioException){
+                   System.out.println("Error in Viewing Challenges");
+               }
+               BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+               String row;
+
+               while (!(row=bufferedReader.readLine()).equals("END")){
+                   System.out.println(row);}
+
+
+
+           Scanner scanner=new Scanner(System.in);
                String ou=scanner.nextLine();
                if("Exit".equals(ou)){
                    handleinput(socket);
@@ -116,6 +130,24 @@ public class Participant {
                 String user="New"+ " " +username+ " " +passWord;
                String out= connectServer(user,socket);
                 System.out.println(out);
+                if("true".equals(out)){
+                    String view="viewChallenges";
+
+                    try{ PrintWriter send=new PrintWriter(socket.getOutputStream(),true);
+                        send.println(view);}
+                    catch (java.io.IOException ioException){
+                        System.out.println("Error in Viewing Challenges");
+                    }
+                    BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String row;
+
+                    while (!(row=bufferedReader.readLine()).equals("END")){
+                        System.out.println(row);}
+
+                }
+
+
+
                 Scanner scanner=new Scanner(System.in);
                 String ou=scanner.nextLine();
                 if("Exit".equals(ou)){

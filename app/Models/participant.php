@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class participant extends Model
+{
+use HasFactory;
+    protected $table='participant';
+    public function getImageUrlAttribute(){
+        return asset('img/participant-images/' . basename($this->image));
+    }
+}
