@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="mailapi">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/OneDrive/Desktop/Client-Server/lib/mailapi.jar!/" />
+      <root url="jar://$USER_HOME$/OneDrive/Desktop/Client-Server/lib/activation.jar!/" />
+      <root url="jar://$USER_HOME$/OneDrive/Desktop/Client-Server/lib/smtp.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
