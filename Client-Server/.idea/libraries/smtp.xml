@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="slf4j-reload4j-2.0.13">
+  <library name="smtp">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/slf4j-reload4j-2.0.13.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/smtp.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

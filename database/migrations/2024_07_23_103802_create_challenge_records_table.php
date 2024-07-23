@@ -11,17 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rejected', function (Blueprint $table) {
-            $table->id();
+        Schema::create('challenge_records', function (Blueprint $table) {
             $table->string('username');
-            $table->string('firstname');
-            $table->string('lastname');
-            $table->string('password')->nullable();
-            $table->string('email')->unique();
-            $table->date('date_of_birth');
             $table->string('registrationNumber');
-            $table->string('image');
-            $table->timestamps();
+            $table->json('CH001')->nullable();
+            $table->json('CH002')->nullable();
+            $table->json('CH003')->nullable();
+            $table->json('CH004')->nullable();
         });
     }
 
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rejected');
+        Schema::dropIfExists('challenge_records');
     }
 };
