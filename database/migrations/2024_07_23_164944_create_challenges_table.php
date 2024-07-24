@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('challenges', function (Blueprint $table) {
-            $table->string('title');
+            $table->string('title')->primary();
             $table->dateTime('start_date');
             $table->dateTime('end_date');
             $table->integer('duration')->comment('Duration in minutes');

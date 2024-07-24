@@ -5,7 +5,7 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class EmailPDF {
+public class ChallengeCheckers12 {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/nationschools";
     private static final String USER = "root";
     private static final String PASS = "";
@@ -13,87 +13,53 @@ public class EmailPDF {
 
     public static void main(String[] args) throws ClassNotFoundException {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter your email: ");
-        String participantEmail = scanner.nextLine();
         System.out.print("Enter challenge title: ");
         String challengeTitle = scanner.nextLine();
         Class.forName("com.mysql.cj.jdbc.Driver");
 
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
-            if (isChallengeActive(conn, challengeTitle)) {
-                boolean wantToRetake = true;
-                int attempts = 0;
-                int bestScore = 0;
-                List<String> bestQuestions = new ArrayList<>();
-                List<String> bestAnswers = new ArrayList<>();
-                List<Long> bestTimesTaken = new ArrayList<>();
-                long bestTotalTimeTaken = 0;
-
-                while (wantToRetake && attempts < 3) {
-                    attempts++;
-                    System.out.println("\nAttempt " + attempts);
-                    List<String> questions = getRandomQuestions(conn, challengeTitle, 10);
-                    List<String> answers = new ArrayList<>();
-                    List<Long> timesTaken = new ArrayList<>();
-                    long totalTimeTaken = 0;
-                    int score = takeTest(conn, challengeTitle, scanner, questions, answers, timesTaken, totalTimeTaken);
-
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestQuestions = new ArrayList<>(questions);
-                        bestAnswers = new ArrayList<>(answers);
-                        bestTimesTaken = new ArrayList<>(timesTaken);
-                        bestTotalTimeTaken = totalTimeTaken;
-                    }
-
-                    if (attempts < 3) {
-                        System.out.print("Do you want to retake the test? (yes/no): ");
-                        String response = scanner.nextLine().trim().toLowerCase();
-                        wantToRetake = response.equals("yes");
-                    } else {
-                        wantToRetake = false;
-                    }
-                }
-
-                System.out.println("\nYour best score is: " + bestScore);
-                String report = generateReport(bestQuestions, bestAnswers, bestTimesTaken, bestTotalTimeTaken, bestScore);
-                String pdfPath = "challenge_report.pdf";
-                PDFUtil.generatePDF(pdfPath, report);
-                EmailUtil.sendEmailWithAttachment(participantEmail, "Challenge Report", "Please find your challenge report attached.", pdfPath);
-            } else {
-                System.out.println("The challenge is not active.");
-            }
+            checkAndPromptQuestions(conn, challengeTitle, scanner);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private static int takeTest(Connection conn, String challengeTitle, Scanner scanner, List<String> questions, List<String> answers, List<Long> timesTaken, long totalTimeTaken) throws SQLException {
-        int totalQuestions = questions.size();
-        int questionNumber = 1;
+    private static void checkAndPromptQuestions(Connection conn, String challengeTitle, Scanner scanner) throws SQLException {
+        if (isChallengeActive(conn, challengeTitle)) {
+            List<String> questions = getRandomQuestions(conn, challengeTitle, 10);
+            List<Long> timesTaken = new ArrayList<>();
+            int totalQuestions = questions.size();
+            int questionNumber = 1;
+            long totalTimeTaken = 0;
+            List<String> userAnswers = new ArrayList<>();
 
-        for (String question : questions) {
-            System.out.println("\nQuestion " + questionNumber + " of " + totalQuestions);
-            if (questionNumber > 1) {
-                System.out.println("Total time taken so far: " + formatTime(totalTimeTaken));
+            for (String question : questions) {
+                System.out.println("\nQuestion " + questionNumber + " of " + totalQuestions);
+                if (questionNumber > 1) {
+                    System.out.println("Total time taken so far: " + formatTime(totalTimeTaken));
+                }
+
+                long startTime = System.currentTimeMillis();
+                String answer = promptQuestion(question, scanner, totalQuestions - questionNumber + 1);
+                long endTime = System.currentTimeMillis();
+                long timeTaken = endTime - startTime;
+                totalTimeTaken += timeTaken;
+                timesTaken.add(timeTaken);
+
+                if (answer == null) {
+                    System.out.println("Time is up! The quiz is now closed.");
+                    break;
+                }
+                userAnswers.add(answer);
+                questionNumber++;
             }
 
-            long startTime = System.currentTimeMillis();
-            String answer = promptQuestion(question, scanner, totalQuestions - questionNumber + 1);
-            long endTime = System.currentTimeMillis();
-            long timeTaken = endTime - startTime;
-            totalTimeTaken += timeTaken;
-            timesTaken.add(timeTaken);
-
-            if (answer == null) {
-                System.out.println("Time is up! The quiz is now closed.");
-                break;
-            }
-            answers.add(answer);
-            questionNumber++;
+            int finalScore = calculateScore(conn, challengeTitle, questions, userAnswers);
+            System.out.println("Your final score is: " + finalScore);
+            displayReport(questions, userAnswers, timesTaken, totalTimeTaken, finalScore);
+        } else {
+            System.out.println("The challenge is not active.");
         }
-
-        return calculateScore(conn, challengeTitle, questions, answers);
     }
 
     private static boolean isChallengeActive(Connection conn, String challengeTitle) throws SQLException {
@@ -185,20 +151,21 @@ public class EmailPDF {
         return String.format("%02d:%02d", minutes, seconds);
     }
 
-    private static String generateReport(List<String> questions, List<String> userAnswers, List<Long> timesTaken, long totalTimeTaken, int score) {
-        StringBuilder report = new StringBuilder();
-        report.append("Challenge Report\n");
-        report.append("Score: ").append(score).append("\n");
-        report.append("Total Time Taken: ").append(formatTime(totalTimeTaken)).append("\n\n");
-        report.append("Questions and Answers:\n");
-
+    private static void displayReport(List<String> questions, List<String> userAnswers, List<Long> timesTaken, long totalTimeTaken, int finalScore) {
+        System.out.println("\n----- Challenge Report -----");
         for (int i = 0; i < questions.size(); i++) {
-            report.append("Question ").append(i + 1).append(": ").append(questions.get(i)).append("\n");
-            report.append("Your Answer: ").append(userAnswers.get(i)).append("\n");
-            report.append("Time Taken: ").append(formatTime(timesTaken.get(i))).append("\n\n");
-        }
+            String question = questions.get(i);
+            String answer = userAnswers.get(i);
+            long timeTaken = timesTaken.get(i);
 
-        return report.toString();
+            System.out.println("Question " + (i + 1) + ": " + question);
+            System.out.println("Your answer: " + answer);
+            System.out.println("Time taken: " + formatTime(timeTaken));
+            System.out.println();
+        }
+        System.out.println("Total time taken: " + formatTime(totalTimeTaken));
+        System.out.println("Your final score: " + finalScore);
+        System.out.println("Percentage: " + (finalScore * 2) + "%");
+        System.out.println("----------------------------");
     }
 }
-
