@@ -60,6 +60,14 @@ public class ChallengeChecker {
             } else {
                 System.out.println("The challenge is not active.");
             }
+    public static void main(String[] args) throws ClassNotFoundException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter challenge title: ");
+        String challengeTitle = scanner.nextLine();
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            checkAndPromptQuestions(conn, challengeTitle, scanner);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -91,6 +99,42 @@ public class ChallengeChecker {
         }
 
         return calculateScore(conn, challengeTitle, questions, answers);
+    private static void checkAndPromptQuestions(Connection conn, String challengeTitle, Scanner scanner) throws SQLException {
+        if (isChallengeActive(conn, challengeTitle)) {
+            List<String> questions = getRandomQuestions(conn, challengeTitle, 10);
+            List<Long> timesTaken = new ArrayList<>();
+            int totalQuestions = questions.size();
+            int questionNumber = 1;
+            long totalTimeTaken = 0;
+            List<String> userAnswers = new ArrayList<>();
+
+            for (String question : questions) {
+                System.out.println("\nQuestion " + questionNumber + " of " + totalQuestions);
+                if (questionNumber > 1) {
+                    System.out.println("Total time taken so far: " + formatTime(totalTimeTaken));
+                }
+
+                long startTime = System.currentTimeMillis();
+                String answer = promptQuestion(question, scanner, totalQuestions - questionNumber + 1);
+                long endTime = System.currentTimeMillis();
+                long timeTaken = endTime - startTime;
+                totalTimeTaken += timeTaken;
+                timesTaken.add(timeTaken);
+
+                if (answer == null) {
+                    System.out.println("Time is up! The quiz is now closed.");
+                    break;
+                }
+                userAnswers.add(answer);
+                questionNumber++;
+            }
+
+            int finalScore = calculateScore(conn, challengeTitle, questions, userAnswers);
+            System.out.println("Your final score is: " + finalScore);
+            displayReport(questions, userAnswers, timesTaken, totalTimeTaken, finalScore);
+        } else {
+            System.out.println("The challenge is not active.");
+        }
     }
 
     private static boolean isChallengeActive(Connection conn, String challengeTitle) throws SQLException {
