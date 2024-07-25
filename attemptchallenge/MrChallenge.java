@@ -5,16 +5,24 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.io.IOException;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.font.*;
+import java.util.Properties;
+import java.io.File;
 
-public class ChallengeChecker {
+
+public class MrChallenge {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/nationschools";
     private static final String USER = "root";
     private static final String PASS = "";
     private static final int QUESTION_TIME_LIMIT = 10; // time limit per question in minutes
 
-    public static void attemptChallenge(String challengeTitle, String schoolName, String regNo, String userName) throws ClassNotFoundException {
+    public static void attemptChallenge(String challengeTitle, String schoolName, String regNo, String userName, String userEmail) throws ClassNotFoundException {
         Scanner scanner = new Scanner(System.in);
         Class.forName("com.mysql.cj.jdbc.Driver");
 
@@ -26,6 +34,7 @@ public class ChallengeChecker {
                 List<String> bestQuestions = new ArrayList<>();
                 List<String> bestAnswers = new ArrayList<>();
                 List<Long> bestTimesTaken = new ArrayList<>();
+                List<String> bestCorrectAnswers = new ArrayList<>();
                 long bestTotalTimeTaken = 0;
 
                 while (wantToRetake && attempts < 3) {
@@ -34,14 +43,16 @@ public class ChallengeChecker {
                     List<String> questions = getRandomQuestions(conn, challengeTitle, 10);
                     List<String> answers = new ArrayList<>();
                     List<Long> timesTaken = new ArrayList<>();
+                    List<String> correctAnswers = new ArrayList<>();
                     long totalTimeTaken = 0;
-                    int score = takeTest(conn, challengeTitle, scanner, questions, answers, timesTaken, totalTimeTaken);
+                    int score = takeTest(conn, challengeTitle, scanner, questions, answers, timesTaken, totalTimeTaken, correctAnswers);
 
                     if (score > bestScore) {
                         bestScore = score;
                         bestQuestions = new ArrayList<>(questions);
                         bestAnswers = new ArrayList<>(answers);
                         bestTimesTaken = new ArrayList<>(timesTaken);
+                        bestCorrectAnswers = new ArrayList<>(correctAnswers);
                         bestTotalTimeTaken = totalTimeTaken;
                     }
 
@@ -56,7 +67,8 @@ public class ChallengeChecker {
 
                 System.out.println("\nYour best score is: " + bestScore);
                 displayReport(bestQuestions, bestAnswers, bestTimesTaken, bestTotalTimeTaken, bestScore);
-                generatePDFReport(schoolName, regNo, challengeTitle, bestQuestions, bestAnswers, bestTimesTaken, bestTotalTimeTaken, bestScore, userName);
+                generatePDFReport(schoolName, regNo, challengeTitle, bestQuestions, bestAnswers, bestTimesTaken, bestTotalTimeTaken, bestScore, userName, bestCorrectAnswers);
+                sendEmailWithAttachment(userEmail, "Challenge Report", "Please find your challenge report attached.", ".idea/Challenge_Report.pdf");
             } else {
                 System.out.println("The challenge is not active.");
             }
@@ -65,7 +77,7 @@ public class ChallengeChecker {
         }
     }
 
-    private static int takeTest(Connection conn, String challengeTitle, Scanner scanner, List<String> questions, List<String> answers, List<Long> timesTaken, long totalTimeTaken) throws SQLException {
+    private static int takeTest(Connection conn, String challengeTitle, Scanner scanner, List<String> questions, List<String> answers, List<Long> timesTaken, long totalTimeTaken, List<String> correctAnswers) throws SQLException {
         int totalQuestions = questions.size();
         int questionNumber = 1;
 
@@ -90,7 +102,7 @@ public class ChallengeChecker {
             questionNumber++;
         }
 
-        return calculateScore(conn, challengeTitle, questions, answers);
+        return calculateScore(conn, challengeTitle, questions, answers, correctAnswers);
     }
 
     private static boolean isChallengeActive(Connection conn, String challengeTitle) throws SQLException {
@@ -143,7 +155,7 @@ public class ChallengeChecker {
         return answer;
     }
 
-    private static int calculateScore(Connection conn, String challengeTitle, List<String> questions, List<String> userAnswers) throws SQLException {
+    private static int calculateScore(Connection conn, String challengeTitle, List<String> questions, List<String> userAnswers, List<String> correctAnswers) throws SQLException {
         int score = 0;
         String query = "SELECT a.answer FROM questionsmore q JOIN answers a ON q.question_id = a.question_id WHERE q.challenge_title = ? AND q.question = ?";
 
@@ -155,6 +167,7 @@ public class ChallengeChecker {
 
                 if (rs.next()) {
                     String correctAnswer = rs.getString("answer");
+                    correctAnswers.add(correctAnswer);
                     String userAnswer = userAnswers.get(i);
 
                     if (userAnswer.equals("-")) {
@@ -172,7 +185,10 @@ public class ChallengeChecker {
         }
 
         // Ensure the score doesn't go below 0
-        return Math.max(score, 0);
+        int maxScore = 10 * 5; // 10 questions, each worth 5 points
+        int finalScore = Math.max(score, 0);
+
+        return (finalScore * 100) / maxScore;
     }
 
     private static String formatTime(long milliseconds) {
@@ -195,12 +211,12 @@ public class ChallengeChecker {
             System.out.println();
         }
         System.out.println("Total time taken: " + formatTime(totalTimeTaken));
-        System.out.println("Your final score: " + finalScore);
-        System.out.println("Percentage: " + (finalScore * 2) + "%");
+        System.out.println("Your final score: " + finalScore + " out of 100");
+        System.out.println("Percentage: " + finalScore + "%");
         System.out.println("----------------------------");
     }
 
-    private static void generatePDFReport(String schoolName, String regNo, String challengeTitle, List<String> questions, List<String> userAnswers, List<Long> timesTaken, long totalTimeTaken, int finalScore, String userName) {
+    private static void generatePDFReport(String schoolName, String regNo, String challengeTitle, List<String> questions, List<String> userAnswers, List<Long> timesTaken, long totalTimeTaken, int finalScore, String userName, List<String> correctAnswers) {
         PDDocument document = new PDDocument();
         PDPage page = new PDPage();
         document.addPage(page);
@@ -209,7 +225,7 @@ public class ChallengeChecker {
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
             // Load Helvetica font
-            PDType0Font font = PDType0Font.load(document, new java.io.File("C:/xampp/htdocs/School-Mathematics-Challenge1/fonts/helvetica/Helvetica.ttf"));
+            PDType0Font font = PDType0Font.load(document, new File("C:/xampp/htdocs/School-Mathematics-Challenge1/fonts/helvetica/Helvetica.ttf"));
 
             contentStream.beginText();
             contentStream.setFont(font, 12);
@@ -224,18 +240,20 @@ public class ChallengeChecker {
             contentStream.newLine();
             contentStream.showText("Challenge Title: " + challengeTitle);
             contentStream.newLine();
-            contentStream.showText("Final Score: " + finalScore);
+            contentStream.showText("Final Score: " + finalScore + " out of 100");
             contentStream.newLine();
             contentStream.showText("Total Time Taken: " + formatTime(totalTimeTaken));
             contentStream.newLine();
 
             contentStream.newLine();
-            contentStream.showText("Questions and Answers:");
+            contentStream.showText("Questions, Answers, and Correct Answers:");
             contentStream.newLine();
             for (int i = 0; i < questions.size(); i++) {
                 contentStream.showText("Question " + (i + 1) + ": " + questions.get(i));
                 contentStream.newLine();
                 contentStream.showText("Your Answer: " + userAnswers.get(i));
+                contentStream.newLine();
+                contentStream.showText("Correct Answer: " + correctAnswers.get(i));
                 contentStream.newLine();
                 contentStream.showText("Time Taken: " + formatTime(timesTaken.get(i)));
                 contentStream.newLine();
@@ -245,7 +263,7 @@ public class ChallengeChecker {
             contentStream.endText();
             contentStream.close();
 
-            document.save(".idea/Challenge_Report.pdf");
+            document.save(".idea/Challenge_Reports.pdf");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -255,5 +273,72 @@ public class ChallengeChecker {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static void sendEmailWithAttachment(String to, String subject, String body, String filename) {
+        final String from = "hermanssenoga@gmail.com"; // Replace with your email
+        final String password = "fead zyzi ivgy afou"; // Replace with your email password
+
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.host", "smtp.gmail.com"); // Gmail SMTP server
+        properties.put("mail.smtp.port", "587");
+        properties.put("mail.smtp.starttls.enable", true);
+        properties.put("mail.smtp.starttls.required", true);
+        properties.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        properties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(from, password);
+            }
+        });
+
+        try {
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(from));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            message.setSubject(subject);
+
+            MimeBodyPart messageBodyPart = new MimeBodyPart();
+            messageBodyPart.setText(body);
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+
+            messageBodyPart = new MimeBodyPart();
+            DataSource source = new FileDataSource(filename);
+            messageBodyPart.setDataHandler(new DataHandler(source));
+            messageBodyPart.setFileName(filename);
+            multipart.addBodyPart(messageBodyPart);
+
+            message.setContent(multipart);
+
+            Transport.send(message);
+            System.out.println("Email sent successfully.");
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void main(String[] args) throws ClassNotFoundException {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter your email: ");
+        String userEmail = scanner.nextLine();
+
+        System.out.print("Enter the challenge title: ");
+        String challengeTitle = scanner.nextLine();
+
+        System.out.print("Enter the school name: ");
+        String schoolName = scanner.nextLine();
+
+        System.out.print("Enter the registration number: ");
+        String regNo = scanner.nextLine();
+
+        System.out.print("Enter your name: ");
+        String userName = scanner.nextLine();
+
+        attemptChallenge(challengeTitle, schoolName, regNo, userName, userEmail);
     }
 }
