@@ -9,18 +9,9 @@ class Challenge extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'title';
-    public $incrementing = false;
-    protected $keyType = 'string';
-
-    protected $fillable = [
-        'title',
-        'start_date',
-        'end_date',
-        'duration',
-        'question_count',
-        'is_active',
-    ];
+    protected $table = 'challenges';
+    protected $guarded = [];
+    
 
 
     /**
