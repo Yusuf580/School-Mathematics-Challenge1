@@ -105,7 +105,7 @@
             </div>
         </div>
         <div class="row mt-4">
-            <div class="col-lg-7 mb-lg-0 mb-4">
+            <div class="col-lg-12 mb-lg-0 mb-4">
                 <div class="card z-index-2 h-100">
                     <div class="card-header pb-0 pt-3 bg-transparent">
                         <h6 class="text-capitalize">Sales overview</h6>
@@ -121,12 +121,11 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-5">
+            <!-- <div class="col-lg-5">
                 <div class="card card-carousel overflow-hidden h-100 p-0">
                     <div id="carouselExampleCaptions" class="carousel slide h-100" data-bs-ride="carousel">
                         <div class="carousel-inner border-radius-lg h-100">
-                            <div class="carousel-item h-100 active" style="background-image: url('./img/carousel-1.jpg');
-            background-size: cover;">
+                            <div class="carousel-item h-100 active" style="background-image: url('./img/carousel-1.jpg'); background-size: cover;">
                                 <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
                                     <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
                                         <i class="ni ni-camera-compact text-dark opacity-10"></i>
@@ -135,8 +134,7 @@
                                     <p>There’s nothing I really wanted to do in life that I wasn’t able to get good at.</p>
                                 </div>
                             </div>
-                            <div class="carousel-item h-100" style="background-image: url('./img/carousel-2.jpg');
-            background-size: cover;">
+                            <div class="carousel-item h-100" style="background-image: url('./img/carousel-2.jpg'); background-size: cover;">
                                 <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
                                     <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
                                         <i class="ni ni-bulb-61 text-dark opacity-10"></i>
@@ -146,8 +144,7 @@
                                         ability to learn.</p>
                                 </div>
                             </div>
-                            <div class="carousel-item h-100" style="background-image: url('./img/carousel-3.jpg');
-            background-size: cover;">
+                            <div class="carousel-item h-100" style="background-image: url('./img/carousel-3.jpg'); background-size: cover;">
                                 <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
                                     <div class="icon icon-shape icon-sm bg-white text-center border-radius-md mb-3">
                                         <i class="ni ni-trophy text-dark opacity-10"></i>
@@ -169,14 +166,14 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="row mt-4">
             <div class="col-lg-7 mb-lg-0 mb-4">
                 <div class="card ">
                     <div class="card-header pb-0 p-3">
                         <div class="d-flex justify-content-between">
-                            <h6 class="mb-2">Sales by Country</h6>
+                            <h6 class="mb-2">Leading by School</h6>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -314,19 +311,19 @@
             <div class="col-lg-5">
                 <div class="card">
                     <div class="card-header pb-0 p-3">
-                        <h6 class="mb-0">Categories</h6>
+                        <h6 class="mb-0">Leading Participants</h6>
                     </div>
                     <div class="card-body p-3">
                         <ul class="list-group">
                             <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                                 <div class="d-flex align-items-center">
                                     <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                                        <i class="ni ni-mobile-button text-white opacity-10"></i>
+                                    <i class="ni ni-satisfied text-white opacity-10"></i>
                                     </div>
                                     <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Devices</h6>
-                                        <span class="text-xs">250 in stock, <span class="font-weight-bold">346+
-                                                sold</span></span>
+                                        <h6 class="mb-1 text-dark text-sm">John Doe 1</h6>
+                                        <span class="text-xs">Marks: <span class="font-weight-bold">90%
+                                                </span></span>
                                     </div>
                                 </div>
                                 <div class="d-flex">
@@ -338,12 +335,12 @@
                             <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                                 <div class="d-flex align-items-center">
                                     <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                                        <i class="ni ni-tag text-white opacity-10"></i>
+                                    <i class="ni ni-satisfied text-white opacity-10"></i>
                                     </div>
                                     <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Tickets</h6>
-                                        <span class="text-xs">123 closed, <span class="font-weight-bold">15
-                                                open</span></span>
+                                        <h6 class="mb-1 text-dark text-sm">John Doe 2</h6>
+                                        <span class="text-xs">Marks: <span class="font-weight-bold">89%
+                                                </span></span>
                                     </div>
                                 </div>
                                 <div class="d-flex">
@@ -355,12 +352,12 @@
                             <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
                                 <div class="d-flex align-items-center">
                                     <div class="icon icon-shape icon-sm me-3 bg-gradient-dark shadow text-center">
-                                        <i class="ni ni-box-2 text-white opacity-10"></i>
+                                    <i class="ni ni-satisfied text-white opacity-10"></i>
                                     </div>
                                     <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Error logs</h6>
-                                        <span class="text-xs">1 is active, <span class="font-weight-bold">40
-                                                closed</span></span>
+                                        <h6 class="mb-1 text-dark text-sm">John Doe 3</h6>
+                                        <span class="text-xs">Marks: <span class="font-weight-bold">87%
+                                                </span></span>
                                     </div>
                                 </div>
                                 <div class="d-flex">
@@ -375,8 +372,8 @@
                                         <i class="ni ni-satisfied text-white opacity-10"></i>
                                     </div>
                                     <div class="d-flex flex-column">
-                                        <h6 class="mb-1 text-dark text-sm">Happy users</h6>
-                                        <span class="text-xs font-weight-bold">+ 430</span>
+                                        <h6 class="mb-1 text-dark text-sm">John Doe 4</h6>
+                                        <span class="text-xs font-weight-bold">Marks: 78%</span>
                                     </div>
                                 </div>
                                 <div class="d-flex">
