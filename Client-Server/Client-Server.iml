@@ -12,5 +12,6 @@
     <orderEntry type="library" name="mailapi" level="project" />
     <orderEntry type="library" name="activation" level="project" />
     <orderEntry type="library" name="smtp" level="project" />
+    <orderEntry type="library" name="json-20240303" level="project" />
   </component>
 </module>

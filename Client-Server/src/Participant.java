@@ -5,11 +5,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
-public class Participant {
+public class Participant extends AttemptChallenge {
+    private String user;
     public static void main(String [] args)throws IOException{
         Socket socket=new Socket("localhost",8000);
         Participant part =new Participant();
         part.handleinput(socket);
+
     }
 
 //METHOD 1..displays the main menu and recieves a command
@@ -36,7 +38,7 @@ public class Participant {
     }
 
     //method 2...Method that handles commands and performs given actions
-    private void handleinput(Socket socket)throws IOException{
+     void handleinput(Socket socket)throws IOException{
         String input=Register();
       String [] details=input.split(" ");
         if("Register".equals(details[0])){
@@ -75,7 +77,7 @@ public class Participant {
 
             }
         }
-        else if("ViewChallenges".equals(details[0]) && details.length<2){
+        else if("viewChallenges".equals(details[0]) && details.length<2){
 
             Scanner key=new Scanner(System.in);
             System.out.println("Please log in first");
@@ -91,7 +93,7 @@ public class Participant {
            String out= connectServer(user,socket);
            if("true".equals(out)){
                String view="viewChallenges";
-
+               this.user=username;
                try{ PrintWriter send=new PrintWriter(socket.getOutputStream(),true);
                    send.println(view);}
                catch (java.io.IOException ioException){
@@ -103,13 +105,20 @@ public class Participant {
                while (!(row=bufferedReader.readLine()).equals("END")){
                    System.out.println(row);}
 
+               Scanner keyboard=new Scanner(System.in);
+               String choice=keyboard.nextLine();
+               String [] split=choice.split(" ");
+               if("attemptChallenge".equals(split[0])){
 
-
-           Scanner scanner=new Scanner(System.in);
-               String ou=scanner.nextLine();
-               if("Exit".equals(ou)){
+               try{ this.handleChallenge(split[1],this.user);}
+               catch (java.lang.ClassNotFoundException e){
+                   e.printStackTrace();
+               }}
+               else{
                    handleinput(socket);
                }
+
+
            }
            else {
                System.out.println("Invalid username or password");
@@ -132,7 +141,7 @@ public class Participant {
                 System.out.println(out);
                 if("true".equals(out)){
                     String view="viewChallenges";
-
+                    this.user=username;
                     try{ PrintWriter send=new PrintWriter(socket.getOutputStream(),true);
                         send.println(view);}
                     catch (java.io.IOException ioException){
@@ -144,15 +153,32 @@ public class Participant {
                     while (!(row=bufferedReader.readLine()).equals("END")){
                         System.out.println(row);}
 
+                    Scanner keyboard=new Scanner(System.in);
+                    String choice=keyboard.nextLine();
+                    String [] split=choice.split(" ");
+                    if("attemptChallenge".equals(split[0])){
+
+                        try{ this.handleChallenge(split[1],this.user);}
+                        catch (java.lang.ClassNotFoundException e){
+                            e.printStackTrace();
+                        }}
+                    else{
+                        handleinput(socket);
+                    }
+
                 }
+               else {
 
-
-
+                    System.out.println("Operation not successful!");
                 Scanner scanner=new Scanner(System.in);
                 String ou=scanner.nextLine();
                 if("Exit".equals(ou)){
                     handleinput(socket);
                 }
+               else {
+                   handleinput(socket);
+                }
+               }
             }
 
             }

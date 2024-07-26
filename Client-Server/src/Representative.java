@@ -16,17 +16,17 @@ public class Representative {
     }
 
     //Method to enable Representative to login
-    private void LogIn(Socket socket)throws java.io.IOException{
+    void LogIn(Socket socket)throws java.io.IOException{
         String verify;
         //String email;
         System.out.println("------Enter Login details------");
          Scanner scanner=new Scanner(System.in);
         System.out.print("Enter emailAdress:");
         this.email=scanner.nextLine();
-     // String password=maskPassword("Enter password:");
-        Console console =System.console();
-        char[] passwordArray=console.readPassword("Enter password(Your password will not be visible on screen:");
-        String password=new String(passwordArray);
+
+
+        System.out.println ("Enter password:");
+        String password=scanner.nextLine();
          verify=verifyLogIn(socket,email,password);
      if("true".equals(verify))
      {

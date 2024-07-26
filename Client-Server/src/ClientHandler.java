@@ -82,13 +82,16 @@ public class ClientHandler extends Thread {
 
              }
              else{
-
-
+                     boolean bool=validateReg(reg_no);
+                if(true==bool){
                applicants(username,firstname,lastname,email,dob,reg_no,image_path);
                System.out.println("New Applicant added...");
                sendEmail(email,firstname,lastname);
 
                output.println("Details submitted !...It might take sometime to confirm your registration..");}
+             else{
+                 output.println("School registration  Number not found");
+               }}
            }
            else if(str.length==3 && "New".equals(str[0])){
                String Username=str[1];
@@ -134,7 +137,9 @@ public class ClientHandler extends Thread {
                    output=new PrintWriter(socket.getOutputStream(),true);
                    output.println("false");
                }}
-
+            else if ("viewChallenges".equals(str[0])){
+                viewChallenges();
+           }
 
            else if("confirm".equals(str[0])){
                confirmApplicants(out);}
@@ -180,7 +185,7 @@ public class ClientHandler extends Thread {
             Session session=Session.getInstance(properties, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication("hermanssenoga@gmail.com","hgqs xvjm rfxl plbd");
+                    return new PasswordAuthentication("hermanssenoga@gmail.com","ffvd oubk vbul hxvz");
                 }
             });
 
@@ -311,14 +316,26 @@ while(resultSet.next()){
                     statement3.setString(5, dateOfBirth);
                     statement3.setString(6, regNo);
                     statement3.setString(7, imagePath);
-
                     statement3.executeUpdate();
+
+                    String sql1 = "DELETE FROM applicants WHERE username=?";
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+
+                     connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools", "root", "");
+
+                    PreparedStatement statement = connection.prepareStatement(sql1);
+                    statement.setString(1, username);
+                    statement.executeUpdate();
+
+                    challenge_records(username,regNo);
 
                     String out="Hello"+ " " +username+ " " +"Your application for the math competition has been confirmed.Please access your account and set" +
                             " your password";
                     confirmationEmail(emailAddress,out);
                     output=new PrintWriter(socket.getOutputStream(),true);
-                    output.println("User confirmed successfully!");}
+                    output.println("User confirmed successfully!");
+
+                }
             }
 
             else{
@@ -328,10 +345,21 @@ while(resultSet.next()){
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools", "root", "");
 
-                PreparedStatement statement = connection.prepareStatement(sql);
+                PreparedStatement stat= connection.prepareStatement(sql);
+                stat.setString(1, username);
+
+                stat.executeUpdate();
+
+                String sql1= "DELETE FROM applicants WHERE username=?";
+                Class.forName("com.mysql.cj.jdbc.Driver");
+
+                 connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools", "root", "");
+
+                PreparedStatement statement = connection.prepareStatement(sql1);
                 statement.setString(1, username);
 
                 statement.executeUpdate();
+
                 String sql2 = "SELECT email FROM rejected WHERE username=?";
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 Connection connection2 = DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools", "root", "");
@@ -348,15 +376,7 @@ while(resultSet.next()){
                 output=new PrintWriter(socket.getOutputStream(),true);
                 output.println("Operation successfull!");
                 }
-        String sql = "DELETE FROM applicants WHERE username=?";
-        Class.forName("com.mysql.cj.jdbc.Driver");
 
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools", "root", "");
-
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1, username);
-
-        statement.executeUpdate();
         }
 
     //Method sends email to Applicants after Representative confirms/rejects their application
@@ -372,7 +392,7 @@ while(resultSet.next()){
         Session session=Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("hermanssenoga@gmail.com","hgqs xvjm rfxl plbd");
+                return new PasswordAuthentication("hermanssenoga@gmail.com","ffvd oubk vbul hxvz");
             }
         });
 
@@ -428,7 +448,7 @@ while(resultSet.next()){
        }
 
        private String saverUserImage(String path,String username) throws IOException {
-           String serverdirectory="C:/xampp/htdocs/School-Mathematics-Challenge1/participant-images/";
+           String serverdirectory="C:/xampp/htdocs/School-Mathematics-Challenge1/public/img/participant-images/";
            byte[] imageData = Files.readAllBytes(Paths.get(path));
 
            File directory=new File(serverdirectory);
@@ -448,30 +468,78 @@ while(resultSet.next()){
 
        }
 
-    private void viewChallenges()throws java.sql.SQLException,
-        java.lang.ClassNotFoundException,java.io.IOException {
-output=new PrintWriter(socket.getOutputStream(),true);
-        String sql="SELECT * FROM challenges WHERE is_valid=1;";
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools","root","");
-        Statement statement =connection.createStatement();
-        ResultSet resultSet=statement.executeQuery(sql);
-        if(resultSet.next()){
-while(resultSet.next()){
-    String challenge_number=resultSet.getString("title");
-    String openingDate=resultSet.getString("start_date");
-    String closingDate=resultSet.getString("end_date");
-    String duration=resultSet.getString("duration");
-    String challenge=(challenge_number+ " " + openingDate + " " +closingDate+ " " +duration);
-    output.println(challenge);
+    private void viewChallenges() throws SQLException, ClassNotFoundException, IOException {
+        output = new PrintWriter(socket.getOutputStream(), true);
+        String sql = "SELECT * FROM challenges WHERE is_active=1;";
 
-}
-    output.println("END");
-        }
-        else {
+        // Load the MySQL JDBC driver
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        // Establish connection to the database
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools", "root", "");
+
+        // Create a statement to execute the SQL query
+        Statement statement = connection.createStatement();
+
+        // Execute the query and get the result set
+        ResultSet resultSet = statement.executeQuery(sql);
+
+        // Check if there are any rows in the result set
+        if (resultSet.next()) {
+            // If there are rows, iterate through them and print each row
+            do {
+                String challenge_number = resultSet.getString("title");
+                String openingDate = resultSet.getString("start_date");
+                String closingDate = resultSet.getString("end_date");
+                String duration = resultSet.getString("duration");
+                String challenge = challenge_number +  "        " + openingDate + "      " + closingDate + "         " + duration;
+                output.println(challenge);
+            } while (resultSet.next());  // Move to the next row if available
+
+            output.println("END");  // Print END after all rows are printed
+        } else {
             output.println("No available challenges");
         }
+
+        // Close resources
+        resultSet.close();
+        statement.close();
+        connection.close();
     }
+
+    //method adds a participant in to a challenge_records table to track their scores
+    private void challenge_records(String user,String reg) throws ClassNotFoundException, SQLException {
+        String sql ="INSERT INTO challenge_records (username,registrationNumber) VALUES(?,?)";
+
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools","root","");
+
+        PreparedStatement statement =connection.prepareStatement(sql);
+        statement.setString(1,user);
+        statement.setString(2,reg);
+        statement.executeUpdate();
+
+    }
+
+    //Method checks to see if applicants' Registration number is among registered schools
+    private boolean validateReg(String reg_no) throws SQLException, ClassNotFoundException {
+        String sql="SELECT * FROM schools WHERE Registration=? ";
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/nationschools","root","");
+
+        PreparedStatement statement =connection.prepareStatement(sql);
+        statement.setString(1,reg_no);
+
+        ResultSet resultSet=statement.executeQuery();
+        if(resultSet.next()){
+            return true;
+
+        }
+        else return false;}
+
+
 
 }
 

@@ -3,10 +3,12 @@
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\AnswerController;
+use App\Http\Controllers\CorrectlyAnswered;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\QuestionsMoreController;
-
-
+use App\Http\Controllers\RankingsController;
+use App\Http\Controllers\RecordsController;
+use App\Http\Controllers\SchoolperformanceController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -26,6 +28,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 //Routes concerning entering the schools
+Route::get('/correctlyAnswered', [CorrectlyAnswered::class,'correct' ])->name('schools.correctlyAnswered');
+Route::get('/rankings', [RankingsController::class,'rankings' ])->name('schools.rankings');
+Route::get('/performance', [SchoolperformanceController::class,'performance' ])->name('schools.performance');
+Route::get('/records', [RecordsController::class,'records_view' ])->name('schools.records');
 Route::get('/participants', [ParticipantController::class,'participant' ])->name('schools.participant');
 Route::get('/schools', [SchoolController::class, 'index'])->name('schools.index');
 Route::get('/schools/create', [SchoolController::class, 'create'])->name('schools.create');
